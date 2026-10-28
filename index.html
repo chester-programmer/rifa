@@ -3,38 +3,39 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Rifa 00 – 99</title>
+<title>Gran Rifa 00 – 99</title>
 <style>
-  :root{
-    --bg:#f6f4ef; --card:#ffffff; --ink:#1d2433; --muted:#6b7280; --line:#d9d6cc;
-    --libre:#ffffff; --pago:#2eb85c; --sep:#f5c518; --accent:#1d2433;
-  }
+  :root{ --bg:#f3f6fc; --card:#fff; --ink:#12266b; --muted:#5b6788; --line:#d3dbee; --pago:#47c75e; --sep:#ffd92e; }
   @media (prefers-color-scheme: dark){
-    :root{ --bg:#14171f; --card:#1c202b; --ink:#eef0f5; --muted:#9aa3b2; --line:#343a49; --accent:#eef0f5; }
+    :root{ --bg:#10152a; --card:#1a2140; --ink:#eef1fb; --muted:#9aa5c6; --line:#34406b; }
   }
   *{box-sizing:border-box}
-  body{margin:0;font-family:Georgia,"Times New Roman",serif;background:var(--bg);color:var(--ink);padding:20px;line-height:1.4}
-  .wrap{max-width:900px;margin:0 auto}
-  h1{font-size:2rem;margin:0 0 4px}
-  p.sub{margin:0 0 18px;color:var(--muted);font-family:system-ui,sans-serif;font-size:.95rem}
-  .bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;font-family:system-ui,sans-serif}
-  .bar input{flex:1;min-width:200px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);font-size:1rem}
-  button{padding:10px 16px;border-radius:8px;border:1px solid var(--accent);background:var(--accent);color:var(--bg);font-size:.95rem;cursor:pointer;font-family:system-ui,sans-serif}
+  body{margin:0;font-family:system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:20px;line-height:1.4}
+  .wrap{max-width:960px;margin:0 auto}
+  h1{font-size:1.9rem;margin:0 0 4px}
+  p.sub{margin:0 0 14px;color:var(--muted);font-size:.95rem}
+  button{padding:10px 16px;border-radius:8px;border:1px solid var(--ink);background:var(--ink);color:var(--bg);font-size:.95rem;cursor:pointer}
   button.sec{background:transparent;color:var(--ink);border-color:var(--line)}
-  button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #3b82f6;outline-offset:1px}
-  .scroll{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--card);max-height:520px;overflow-y:auto}
-  table{width:100%;border-collapse:collapse;font-family:system-ui,sans-serif}
+  button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid #3b82f6;outline-offset:1px}
+  input,select{padding:8px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--ink);font-size:.95rem;width:100%}
+  details{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:16px}
+  summary{cursor:pointer;font-weight:600}
+  .cfg{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;margin-top:12px}
+  .cfg label{font-size:.8rem;color:var(--muted);display:block}
+  .foto{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px}
+  .foto input{width:auto}
+  .scroll{overflow:auto;border:1px solid var(--line);border-radius:10px;background:var(--card);max-height:520px}
+  table{width:100%;border-collapse:collapse}
   th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left}
   th{position:sticky;top:0;background:var(--card);z-index:1;font-size:.85rem}
   td.n{font-weight:700;width:60px;font-variant-numeric:tabular-nums}
-  td input,td select{width:100%;padding:7px 8px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--ink);font-size:.95rem}
   tr.PAGO td.n{background:var(--pago);color:#fff}
   tr.SEPARADO td.n{background:var(--sep);color:#222}
-  h2{margin:28px 0 10px;font-size:1.3rem}
+  h2{margin:26px 0 10px;font-size:1.3rem}
   canvas{width:100%;height:auto;border:1px solid var(--line);border-radius:10px;display:block;background:#fff}
-  .counters{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px;font-family:system-ui,sans-serif}
+  .counters{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
   .c{border:1px solid var(--line);border-radius:10px;padding:12px;text-align:center;background:var(--card)}
-  .c b{display:block;font-size:2rem;font-family:Georgia,serif}
+  .c b{display:block;font-size:2rem}
   .c span{font-size:.9rem;color:var(--muted)}
   .c.l{border-top:6px solid #cfcfcf}.c.s{border-top:6px solid var(--sep)}.c.p{border-top:6px solid var(--pago)}
   .actions{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap}
@@ -43,12 +44,18 @@
 <body>
 <div class="wrap">
   <h1>Control de rifa</h1>
-  <p class="sub">Números del 00 al 99. Los cambios se guardan solos en este navegador.</p>
+  <p class="sub">Números del 00 al 99. Los cambios se guardan solos y se ven en cualquier dispositivo.</p>
+  <p class="sub" id="estado" style="margin-top:-8px"></p>
 
-  <div class="bar">
-    <input id="titulo" type="text" placeholder="Nombre de la rifa (aparece en la imagen)">
-    <button class="sec" id="reset">Borrar todo</button>
-  </div>
+  <details>
+    <summary>Personalizar la imagen (textos y foto del premio)</summary>
+    <div class="cfg" id="cfg"></div>
+    <div class="foto">
+      <label for="foto">Foto del premio:</label>
+      <input type="file" id="foto" accept="image/*">
+      <button class="sec" id="quitarFoto" type="button">Quitar foto</button>
+    </div>
+  </details>
 
   <div class="scroll">
     <table>
@@ -57,60 +64,149 @@
     </table>
   </div>
 
-  <h2>Tablero</h2>
-  <canvas id="cv" width="1000" height="1180"></canvas>
+  <h2>Imagen de la rifa</h2>
+  <canvas id="cv" width="1300" height="1220"></canvas>
 
   <div class="counters">
-    <div class="c l"><b id="cL">100</b><span>Libres</span></div>
-    <div class="c s"><b id="cS">0</b><span>Separados</span></div>
-    <div class="c p"><b id="cP">0</b><span>Pagos</span></div>
+    <div class="c l"><b id="cL">100</b><span>Disponibles</span></div>
+    <div class="c s"><b id="cS">0</b><span>Apartados</span></div>
+    <div class="c p"><b id="cP">0</b><span>Pagados</span></div>
   </div>
 
   <div class="actions">
     <button id="dl">Descargar imagen</button>
+    <button class="sec" id="reset">Borrar números y datos</button>
   </div>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script>
-const KEY = "rifa_datos_v1";
+/* ============ PEGA AQUÍ LA CONFIGURACIÓN DE TU FIREBASE ============ */
+const firebaseConfig = {
+  apiKey: "AIzaSyCUqTnLcxSsyC6iOwXthR15-GXxzke5QF0",
+  authDomain: "rifa-69bd5.firebaseapp.com",
+  databaseURL: "https://rifa-69bd5-default-rtdb.firebaseio.com",
+  projectId: "rifa-69bd5",
+  storageBucket: "rifa-69bd5.firebasestorage.app",
+  messagingSenderId: "505080005937",
+  appId: "1:505080005937:web:6888c5aefb81fe35789c10"
+};
+/* =================================================================== */
+
+const NUBE = /^https:\/\//.test(firebaseConfig.databaseURL);
+const KEY = "rifa_datos_v2";
 const ESTADOS = ["LIBRE","SEPARADO","PAGO"];
-const COLOR = {LIBRE:"#ffffff", SEPARADO:"#f5c518", PAGO:"#2eb85c"};
 const pad = n => String(n).padStart(2,"0");
+const vacia = () => ({nombre:"",telefono:"",estado:"LIBRE"});
 
-let data = { titulo:"", filas: Array.from({length:100},()=>({nombre:"",telefono:"",estado:"LIBRE"})) };
+const CAMPOS = [
+  ["t1a","Título, palabra 1"],["t1b","Título, palabra 2"],["premio","Premio"],["gancho","Frase llamativa"],
+  ["producto","Producto"],["desc","Descripción corta"],
+  ["s1a","Característica 1 (título)"],["s1b","Característica 1 (detalle)"],
+  ["s2a","Característica 2 (título)"],["s2b","Característica 2 (detalle)"],
+  ["s3a","Característica 3 (título)"],["s3b","Característica 3 (detalle)"],
+  ["cta","Frase de cierre"],["f1","Ventaja 1"],["f2","Ventaja 2"],["f3","Ventaja 3"],
+  ["pago","Métodos de pago"],["tel","Teléfono / WhatsApp"]
+];
+const CFG0 = {
+  t1a:"GRAN", t1b:"RIFA", premio:"DE UN PORTÁTIL", gancho:"Tu número puede ser el ganador",
+  producto:"Dell Latitude 3420", desc:"Rendimiento y confiabilidad en tus manos",
+  s1a:"Procesador", s1b:"Intel Core i5 1135G7", s2a:"RAM", s2b:"8 GB DDR4", s3a:"Almacenamiento", s3b:"NVMe 512 GB",
+  cta:"¡Participa y gana!", f1:"Diseño moderno y portátil", f2:"Rendimiento y velocidad",
+  f3:"Ideal para estudiar, trabajar y mucho más...", pago:"Nequi o pago por Bre-b", tel:"3202464794"
+};
+const nuevoData = () => ({ cfg:{...CFG0}, img:"", filas: Array.from({length:100}, vacia) });
 
-function cargar(){
+let data = nuevoData();
+let db = null;
+const tbody = document.getElementById("tbody");
+const estadoEl = document.getElementById("estado");
+const inputs = [];
+const cfgInputs = {};
+
+/* ---------- Guardado ---------- */
+function guardarLocal(){ try{ localStorage.setItem(KEY, JSON.stringify(data)); }catch(e){} }
+function cargarLocal(){
   try{
     const g = JSON.parse(localStorage.getItem(KEY));
-    if(g && Array.isArray(g.filas) && g.filas.length===100) data = g;
+    if(g && Array.isArray(g.filas) && g.filas.length===100){ data = g; data.cfg = {...CFG0, ...(g.cfg||{})}; }
   }catch(e){}
 }
-function guardar(){
-  try{ localStorage.setItem(KEY, JSON.stringify(data)); }catch(e){}
+function guardarFila(i){ NUBE ? db.ref("rifa/filas/"+i).set(data.filas[i]) : guardarLocal(); }
+function guardarCfg(k){ NUBE ? db.ref("rifa/cfg/"+k).set(data.cfg[k]) : guardarLocal(); }
+function guardarImg(){ NUBE ? db.ref("rifa/img").set(data.img) : guardarLocal(); }
+
+/* ---------- Formulario de textos ---------- */
+const cfgBox = document.getElementById("cfg");
+CAMPOS.forEach(([k,lab])=>{
+  const d = document.createElement("div");
+  d.innerHTML = `<label for="c_${k}">${lab}</label><input id="c_${k}" type="text">`;
+  const inp = d.querySelector("input");
+  inp.addEventListener("input", ()=>{ data.cfg[k] = inp.value; guardarCfg(k); resumen(); });
+  cfgBox.appendChild(d); cfgInputs[k] = inp;
+});
+
+/* ---------- Foto del premio ---------- */
+document.getElementById("foto").addEventListener("change", e=>{
+  const f = e.target.files[0]; if(!f) return;
+  const rd = new FileReader();
+  rd.onload = ()=>{
+    const im = new Image();
+    im.onload = ()=>{
+      const m = Math.min(1, 800/Math.max(im.width, im.height));
+      const c = document.createElement("canvas");
+      c.width = Math.round(im.width*m); c.height = Math.round(im.height*m);
+      c.getContext("2d").drawImage(im,0,0,c.width,c.height);
+      data.img = c.toDataURL("image/jpeg",0.82); guardarImg(); resumen();
+    };
+    im.src = rd.result;
+  };
+  rd.readAsDataURL(f);
+});
+document.getElementById("quitarFoto").addEventListener("click", ()=>{ data.img=""; guardarImg(); resumen(); });
+
+let imgObj = null, imgSrc = "";
+function actualizarImg(){
+  if(data.img === imgSrc) return;
+  imgSrc = data.img;
+  if(!imgSrc){ imgObj = null; return; }
+  const im = new Image();
+  im.onload = ()=>{ imgObj = im; dibujar(conteos()); };
+  im.src = imgSrc;
 }
 
-const tbody = document.getElementById("tbody");
-const tituloEl = document.getElementById("titulo");
-
+/* ---------- Tabla ---------- */
 function construir(){
-  tbody.innerHTML = "";
-  data.filas.forEach((f,i)=>{
+  tbody.innerHTML = ""; inputs.length = 0;
+  for(let i=0;i<100;i++){
     const tr = document.createElement("tr");
-    tr.className = f.estado;
     tr.innerHTML = `
       <td class="n">${pad(i)}</td>
-      <td><input type="text" aria-label="Nombre ${pad(i)}" value=""></td>
-      <td><input type="tel" aria-label="Teléfono ${pad(i)}" value=""></td>
+      <td><input type="text" aria-label="Nombre ${pad(i)}"></td>
+      <td><input type="tel" aria-label="Teléfono ${pad(i)}"></td>
       <td><select aria-label="Estado ${pad(i)}">
         ${ESTADOS.map(e=>`<option value="${e}">${e}</option>`).join("")}
       </select></td>`;
-    const [ , inN, inT, sel ] = [0, ...tr.querySelectorAll("input,select")];
-    inN.value = f.nombre; inT.value = f.telefono; sel.value = f.estado;
-    inN.addEventListener("input", ()=>{ f.nombre = inN.value; actualizar(); });
-    inT.addEventListener("input", ()=>{ f.telefono = inT.value; actualizar(); });
-    sel.addEventListener("change", ()=>{ f.estado = sel.value; tr.className = f.estado; actualizar(); });
+    const [n,t] = tr.querySelectorAll("input"), s = tr.querySelector("select");
+    n.addEventListener("input", ()=>{ data.filas[i].nombre = n.value; guardarFila(i); resumen(); });
+    t.addEventListener("input", ()=>{ data.filas[i].telefono = t.value; guardarFila(i); resumen(); });
+    s.addEventListener("change", ()=>{ data.filas[i].estado = s.value; tr.className = s.value; guardarFila(i); resumen(); });
     tbody.appendChild(tr);
+    inputs.push({tr,n,t,s});
+  }
+}
+
+function pintar(){
+  inputs.forEach((o,i)=>{
+    const f = data.filas[i];
+    if(document.activeElement !== o.n) o.n.value = f.nombre;
+    if(document.activeElement !== o.t) o.t.value = f.telefono;
+    if(document.activeElement !== o.s) o.s.value = f.estado;
+    o.tr.className = f.estado;
   });
+  CAMPOS.forEach(([k])=>{ if(document.activeElement !== cfgInputs[k]) cfgInputs[k].value = data.cfg[k] ?? ""; });
+  resumen();
 }
 
 function conteos(){
@@ -118,66 +214,190 @@ function conteos(){
   data.filas.forEach(f=>c[f.estado]++);
   return c;
 }
-
-function dibujar(){
-  const cv = document.getElementById("cv"), ctx = cv.getContext("2d");
-  const W = cv.width, H = cv.height, c = conteos();
-  ctx.fillStyle = "#fff"; ctx.fillRect(0,0,W,H);
-
-  ctx.fillStyle = "#1d2433"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-  ctx.font = "bold 48px Georgia, serif";
-  ctx.fillText(data.titulo || "Rifa", W/2, 60);
-
-  const cell = 90, gx = (W - cell*10)/2, gy = 120;
-  ctx.font = "bold 34px Georgia, serif";
-  for(let i=0;i<100;i++){
-    const x = gx + (i%10)*cell, y = gy + Math.floor(i/10)*cell;
-    ctx.fillStyle = COLOR[data.filas[i].estado];
-    ctx.fillRect(x,y,cell,cell);
-    ctx.strokeStyle = "#1d2433"; ctx.lineWidth = 2; ctx.strokeRect(x,y,cell,cell);
-    ctx.fillStyle = data.filas[i].estado==="PAGO" ? "#fff" : "#1d2433";
-    ctx.fillText(pad(i), x+cell/2, y+cell/2);
-  }
-
-  const by = gy + cell*10 + 40, bw = 280, gap = 30, bx = (W - (bw*3+gap*2))/2;
-  const items = [["LIBRES",c.LIBRE,"#ffffff"],["SEPARADOS",c.SEPARADO,"#f5c518"],["PAGOS",c.PAGO,"#2eb85c"]];
-  items.forEach(([lab,val,col],k)=>{
-    const x = bx + k*(bw+gap);
-    ctx.fillStyle = col; ctx.fillRect(x,by,bw,110);
-    ctx.strokeStyle = "#1d2433"; ctx.lineWidth = 2; ctx.strokeRect(x,by,bw,110);
-    ctx.fillStyle = col==="#2eb85c" ? "#fff" : "#1d2433";
-    ctx.font = "bold 52px Georgia, serif"; ctx.fillText(val, x+bw/2, by+42);
-    ctx.font = "22px system-ui, sans-serif"; ctx.fillText(lab, x+bw/2, by+88);
-  });
-}
-
-function actualizar(){
+function resumen(){
   const c = conteos();
   document.getElementById("cL").textContent = c.LIBRE;
   document.getElementById("cS").textContent = c.SEPARADO;
   document.getElementById("cP").textContent = c.PAGO;
-  dibujar(); guardar();
+  actualizarImg();
+  dibujar(c);
 }
 
-tituloEl.addEventListener("input", ()=>{ data.titulo = tituloEl.value; actualizar(); });
+/* ---------- Dibujo de la imagen ---------- */
+function rr(ctx,x,y,w,h,r){
+  ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath();
+}
+function banda(ctx,x,y,w,h,col,s=22){
+  ctx.fillStyle = col; ctx.beginPath();
+  ctx.moveTo(x+s,y); ctx.lineTo(x+w,y); ctx.lineTo(x+w-s,y+h); ctx.lineTo(x,y+h); ctx.closePath(); ctx.fill();
+}
+function lineas(ctx,txt,maxW){
+  const out=[]; let l="";
+  String(txt||"").split(" ").forEach(w=>{
+    const t = l ? l+" "+w : w;
+    if(ctx.measureText(t).width > maxW && l){ out.push(l); l = w; } else l = t;
+  });
+  if(l) out.push(l); return out;
+}
+function texto(ctx,txt,x,y,maxW,lh){            // devuelve la y final
+  const ls = lineas(ctx,txt,maxW);
+  ls.forEach((l,i)=>ctx.fillText(l,x,y+i*lh));
+  return y + ls.length*lh;
+}
+function ajustar(ctx,txt,peso,tam,maxW,fam){    // reduce la letra hasta que quepa
+  let t = tam;
+  do{ ctx.font = `${peso} ${t}px ${fam}`; t -= 2; }while(ctx.measureText(txt).width > maxW && t > 12);
+}
+const FUENTE = '"Arial Black", Impact, Arial, sans-serif';
 
+function dibujar(c){
+  const cv = document.getElementById("cv"), ctx = cv.getContext("2d");
+  const W = cv.width, H = cv.height, k = data.cfg;
+  const AZUL="#0a1f63", AMAR="#ffd92e", NAV="#12266b";
+  ctx.textBaseline = "middle"; ctx.lineJoin = "round";
+
+  // Fondo
+  let g = ctx.createLinearGradient(0,0,W,H); g.addColorStop(0,"#e3f2ff"); g.addColorStop(1,"#a9d2ff");
+  ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
+  g = ctx.createLinearGradient(0,0,680,H); g.addColorStop(0,"#0a2a8a"); g.addColorStop(1,"#1558cf");
+  ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(640,0); ctx.lineTo(668,H); ctx.lineTo(0,H); ctx.fill();
+  ctx.fillStyle = AMAR; ctx.beginPath(); ctx.moveTo(W-280,H); ctx.lineTo(W,H-230); ctx.lineTo(W,H); ctx.fill();
+
+  // Título
+  ctx.textAlign = "left";
+  ctx.font = `italic 900 120px ${FUENTE}`; ctx.lineWidth = 14; ctx.strokeStyle = NAV;
+  ctx.strokeText(k.t1a||"",150,115); ctx.fillStyle = "#fff"; ctx.fillText(k.t1a||"",150,115);
+  ajustar(ctx,k.t1b||"","italic 900",190,440,FUENTE); ctx.lineWidth = 16;
+  ctx.strokeText(k.t1b||"",110,255); ctx.fillStyle = AMAR; ctx.fillText(k.t1b||"",110,255);
+  ctx.font = "80px serif"; ctx.fillText("📢",15,205);
+  banda(ctx,70,325,500,78,AMAR);
+  ajustar(ctx,k.premio||"","italic 900",44,430,FUENTE); ctx.fillStyle = NAV; ctx.textAlign = "center";
+  ctx.fillText(k.premio||"",320,364);
+
+  // Frase llamativa inclinada
+  ctx.save(); ctx.translate(585,205); ctx.rotate(-0.17); ctx.fillStyle = "#fff";
+  ctx.font = "italic 700 30px Arial, sans-serif"; texto(ctx,k.gancho,0,-30,180,36); ctx.restore();
+
+  // Foto + producto
+  if(imgObj){
+    const s = Math.min(400/imgObj.width, 320/imgObj.height), w = imgObj.width*s, h = imgObj.height*s;
+    ctx.drawImage(imgObj, 15+(400-w)/2, 425+(320-h)/2, w, h);
+  }else{
+    ctx.setLineDash([10,8]); ctx.strokeStyle = "rgba(255,255,255,.6)"; ctx.lineWidth = 3;
+    rr(ctx,25,435,380,300,20); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle = "rgba(255,255,255,.75)"; ctx.font = "24px Arial"; ctx.fillText("Sube la foto del premio",215,585);
+  }
+  ctx.textAlign = "left"; ctx.fillStyle = "#fff"; ctx.font = "900 40px Arial, sans-serif";
+  let y = texto(ctx,k.producto,430,490,225,46);
+  ctx.font = "600 25px Arial, sans-serif"; texto(ctx,k.desc,430,y+22,225,31);
+
+  // Características
+  ctx.fillStyle = AZUL; rr(ctx,28,770,625,165,22); ctx.fill();
+  ctx.strokeStyle = "#3f86ff"; ctx.lineWidth = 2; rr(ctx,28,770,625,165,22); ctx.stroke();
+  ctx.textAlign = "center"; ctx.fillStyle = "#fff"; ctx.font = "bold 27px Arial, sans-serif";
+  [[k.s1a,k.s1b],[k.s2a,k.s2b],[k.s3a,k.s3b]].forEach(([a,b],i)=>{
+    const cx = 28 + 104 + i*208, ls = lineas(ctx,`${a||""} ${b||""}`,185);
+    ls.slice(0,4).forEach((l,j)=>ctx.fillText(l,cx, 852 - (Math.min(ls.length,4)-1)*16 + j*32));
+    if(i>0){ ctx.strokeStyle="#4aa3ff"; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(28+i*208,792); ctx.lineTo(28+i*208,913); ctx.stroke(); }
+  });
+
+  // Frase de cierre
+  banda(ctx,15,962,640,90,AMAR,26);
+  ctx.font = "50px serif"; ctx.fillStyle = NAV; ctx.fillText("🏆",70,1008);
+  ajustar(ctx,k.cta||"","italic 900",50,470,FUENTE); ctx.fillText(k.cta||"",375,1008);
+
+  // Ventajas
+  ctx.fillStyle = AZUL; ctx.fillRect(0,1092,652,128);
+  [[k.f1,"💻"],[k.f2,"🛡️"],[k.f3,"👍"]].forEach(([t,ic],i)=>{
+    const cx = 18 + 105 + i*217;
+    ctx.font = "34px serif"; ctx.fillStyle = "#fff"; ctx.fillText(ic,cx,1128);
+    ctx.font = "bold 20px Arial, sans-serif"; lineas(ctx,t,195).slice(0,3).forEach((l,j)=>ctx.fillText(l,cx,1166+j*25));
+  });
+
+  // Encabezado derecho
+  banda(ctx,690,18,570,125,AMAR,28); ctx.fillStyle = NAV;
+  ajustar(ctx,"NÚMEROS DE LA RIFA","italic 900",38,500,FUENTE); ctx.fillText("NÚMEROS DE LA RIFA",975,58);
+  ajustar(ctx,"DEL 00 AL 99","italic 900",62,480,FUENTE); ctx.fillText("DEL 00 AL 99",975,110);
+
+  // Tablero
+  ctx.fillStyle = "#fff"; rr(ctx,678,152,602,885,26); ctx.fill();
+  ctx.strokeStyle = "#2f8cff"; ctx.lineWidth = 5; rr(ctx,678,152,602,885,26); ctx.stroke();
+  const COL = {LIBRE:["#ffffff","#c3cde6"], SEPARADO:["#ffd92e","#d9ae00"], PAGO:["#47c75e","#2a9e40"]};
+  const cw = 53, gp = 5.2, ch = 62, gv = 5, x0 = 678 + (602 - (10*cw + 9*gp))/2, y0 = 170;
+  ctx.font = "bold 30px Arial, sans-serif";
+  for(let i=0;i<100;i++){
+    const x = x0 + (i%10)*(cw+gp), yy = y0 + Math.floor(i/10)*(ch+gv), [f,b] = COL[data.filas[i].estado];
+    ctx.fillStyle = f; rr(ctx,x,yy,cw,ch,10); ctx.fill();
+    ctx.strokeStyle = b; ctx.lineWidth = 2.5; rr(ctx,x,yy,cw,ch,10); ctx.stroke();
+    ctx.fillStyle = NAV; ctx.fillText(pad(i),x+cw/2,yy+ch/2+1);
+  }
+
+  // Leyenda
+  ctx.fillStyle = AZUL; rr(ctx,692,852,576,66,18); ctx.fill();
+  [["Disponible","LIBRE"],["Apartado","SEPARADO"],["Pagado","PAGO"]].forEach(([t,e],i)=>{
+    const x = 708 + i*190;
+    ctx.fillStyle = COL[e][0]; rr(ctx,x,862,44,44,10); ctx.fill();
+    ctx.strokeStyle = COL[e][1]; ctx.lineWidth = 2; rr(ctx,x,862,44,44,10); ctx.stroke();
+    ctx.fillStyle = "#fff"; ctx.textAlign = "left"; ctx.font = "bold 23px Arial, sans-serif"; ctx.fillText(t,x+54,885);
+  });
+
+  // Contadores
+  ctx.fillStyle = AZUL; rr(ctx,692,930,576,96,18); ctx.fill();
+  [["Números disponibles",c.LIBRE,"LIBRE"],["Números apartados",c.SEPARADO,"SEPARADO"],["Números pagados",c.PAGO,"PAGO"]].forEach(([t,v,e],i)=>{
+    const x = 692 + i*192, cx = x + 96;
+    ctx.textAlign = "center"; ctx.fillStyle = "#fff"; ctx.font = "bold 18px Arial, sans-serif"; ctx.fillText(t,cx,950);
+    ctx.fillStyle = COL[e][0]; rr(ctx,x+16,964,160,52,14); ctx.fill();
+    ctx.fillStyle = NAV; ctx.font = "900 38px Arial, sans-serif"; ctx.fillText(v,cx,991);
+    if(i>0){ ctx.strokeStyle="#4a68b8"; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(x,946); ctx.lineTo(x,1010); ctx.stroke(); }
+  });
+
+  // Pagos
+  ctx.fillStyle = AZUL; rr(ctx,672,1056,618,152,22); ctx.fill();
+  ctx.strokeStyle = AMAR; ctx.lineWidth = 3; rr(ctx,672,1056,618,152,22); ctx.stroke();
+  ctx.textAlign = "left"; ctx.fillStyle = "#fff"; ctx.font = "italic 700 26px Arial, sans-serif"; ctx.fillText("Métodos de pago:",705,1086);
+  ctx.fillStyle = AMAR; ajustar(ctx,k.pago||"","italic 900",40,555,FUENTE); ctx.fillText(k.pago||"",705,1130);
+  ctx.fillStyle = "#25d366"; ctx.beginPath(); ctx.arc(738,1176,24,0,7); ctx.fill();
+  ctx.fillStyle = "#fff"; ctx.textAlign = "center"; ctx.font = "900 17px Arial"; ctx.fillText("WA",738,1177);
+  ctx.textAlign = "left"; ajustar(ctx,k.tel||"","italic 900",52,480,FUENTE); ctx.fillText(k.tel||"",780,1177);
+}
+
+/* ---------- Eventos ---------- */
 document.getElementById("dl").addEventListener("click", ()=>{
   const a = document.createElement("a");
   a.href = document.getElementById("cv").toDataURL("image/png");
-  a.download = "rifa.png";
-  a.click();
+  a.download = "rifa.png"; a.click();
 });
-
 document.getElementById("reset").addEventListener("click", ()=>{
-  if(!confirm("¿Borrar todos los nombres, teléfonos y estados?")) return;
-  data = { titulo:"", filas: Array.from({length:100},()=>({nombre:"",telefono:"",estado:"LIBRE"})) };
-  tituloEl.value = ""; construir(); actualizar();
+  if(!confirm("¿Borrar todos los nombres, teléfonos y estados? (los textos y la foto se conservan)")) return;
+  data.filas = Array.from({length:100}, vacia);
+  NUBE ? db.ref("rifa/filas").set(data.filas) : guardarLocal();
+  pintar();
 });
 
-cargar();
-tituloEl.value = data.titulo || "";
+/* ---------- Inicio ---------- */
 construir();
-actualizar();
+if(NUBE){
+  estadoEl.textContent = "Conectando…";
+  firebase.initializeApp(firebaseConfig);
+  db = firebase.database();
+  db.ref(".info/connected").on("value", s=>{
+    estadoEl.textContent = s.val() ? "● Sincronizado en la nube" : "● Sin conexión, reintentando…";
+  });
+  db.ref("rifa").on("value", snap=>{
+    const v = snap.val() || {};
+    data.cfg = {...CFG0, ...(v.cfg||{})};
+    data.img = v.img || "";
+    for(let i=0;i<100;i++){
+      const r = v.filas && v.filas[i];
+      data.filas[i] = { nombre:r?.nombre||"", telefono:r?.telefono||"", estado:ESTADOS.includes(r?.estado)?r.estado:"LIBRE" };
+    }
+    pintar();
+  }, ()=>{ estadoEl.textContent = "Error de permisos: revisa las reglas de Firebase."; });
+}else{
+  estadoEl.textContent = "Modo local: los datos solo se guardan en este navegador (falta configurar Firebase).";
+  cargarLocal(); pintar();
+}
 </script>
 </body>
 </html>

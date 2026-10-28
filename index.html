@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rifa 00 – 99</title>
+<style>
+  :root{
+    --bg:#f6f4ef; --card:#ffffff; --ink:#1d2433; --muted:#6b7280; --line:#d9d6cc;
+    --libre:#ffffff; --pago:#2eb85c; --sep:#f5c518; --accent:#1d2433;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#14171f; --card:#1c202b; --ink:#eef0f5; --muted:#9aa3b2; --line:#343a49; --accent:#eef0f5; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Georgia,"Times New Roman",serif;background:var(--bg);color:var(--ink);padding:20px;line-height:1.4}
+  .wrap{max-width:900px;margin:0 auto}
+  h1{font-size:2rem;margin:0 0 4px}
+  p.sub{margin:0 0 18px;color:var(--muted);font-family:system-ui,sans-serif;font-size:.95rem}
+  .bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;font-family:system-ui,sans-serif}
+  .bar input{flex:1;min-width:200px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);font-size:1rem}
+  button{padding:10px 16px;border-radius:8px;border:1px solid var(--accent);background:var(--accent);color:var(--bg);font-size:.95rem;cursor:pointer;font-family:system-ui,sans-serif}
+  button.sec{background:transparent;color:var(--ink);border-color:var(--line)}
+  button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #3b82f6;outline-offset:1px}
+  .scroll{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--card);max-height:520px;overflow-y:auto}
+  table{width:100%;border-collapse:collapse;font-family:system-ui,sans-serif}
+  th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left}
+  th{position:sticky;top:0;background:var(--card);z-index:1;font-size:.85rem}
+  td.n{font-weight:700;width:60px;font-variant-numeric:tabular-nums}
+  td input,td select{width:100%;padding:7px 8px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--ink);font-size:.95rem}
+  tr.PAGO td.n{background:var(--pago);color:#fff}
+  tr.SEPARADO td.n{background:var(--sep);color:#222}
+  h2{margin:28px 0 10px;font-size:1.3rem}
+  canvas{width:100%;height:auto;border:1px solid var(--line);border-radius:10px;display:block;background:#fff}
+  .counters{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px;font-family:system-ui,sans-serif}
+  .c{border:1px solid var(--line);border-radius:10px;padding:12px;text-align:center;background:var(--card)}
+  .c b{display:block;font-size:2rem;font-family:Georgia,serif}
+  .c span{font-size:.9rem;color:var(--muted)}
+  .c.l{border-top:6px solid #cfcfcf}.c.s{border-top:6px solid var(--sep)}.c.p{border-top:6px solid var(--pago)}
+  .actions{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Control de rifa</h1>
+  <p class="sub">Números del 00 al 99. Los cambios se guardan solos en este navegador.</p>
+
+  <div class="bar">
+    <input id="titulo" type="text" placeholder="Nombre de la rifa (aparece en la imagen)">
+    <button class="sec" id="reset">Borrar todo</button>
+  </div>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Número</th><th>Nombre</th><th>Teléfono</th><th>Estado</th></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+
+  <h2>Tablero</h2>
+  <canvas id="cv" width="1000" height="1180"></canvas>
+
+  <div class="counters">
+    <div class="c l"><b id="cL">100</b><span>Libres</span></div>
+    <div class="c s"><b id="cS">0</b><span>Separados</span></div>
+    <div class="c p"><b id="cP">0</b><span>Pagos</span></div>
+  </div>
+
+  <div class="actions">
+    <button id="dl">Descargar imagen</button>
+  </div>
+</div>
+
+<script>
+const KEY = "rifa_datos_v1";
+const ESTADOS = ["LIBRE","SEPARADO","PAGO"];
+const COLOR = {LIBRE:"#ffffff", SEPARADO:"#f5c518", PAGO:"#2eb85c"};
+const pad = n => String(n).padStart(2,"0");
+
+let data = { titulo:"", filas: Array.from({length:100},()=>({nombre:"",telefono:"",estado:"LIBRE"})) };
+
+function cargar(){
+  try{
+    const g = JSON.parse(localStorage.getItem(KEY));
+    if(g && Array.isArray(g.filas) && g.filas.length===100) data = g;
+  }catch(e){}
+}
+function guardar(){
+  try{ localStorage.setItem(KEY, JSON.stringify(data)); }catch(e){}
+}
+
+const tbody = document.getElementById("tbody");
+const tituloEl = document.getElementById("titulo");
+
+function construir(){
+  tbody.innerHTML = "";
+  data.filas.forEach((f,i)=>{
+    const tr = document.createElement("tr");
+    tr.className = f.estado;
+    tr.innerHTML = `
+      <td class="n">${pad(i)}</td>
+      <td><input type="text" aria-label="Nombre ${pad(i)}" value=""></td>
+      <td><input type="tel" aria-label="Teléfono ${pad(i)}" value=""></td>
+      <td><select aria-label="Estado ${pad(i)}">
+        ${ESTADOS.map(e=>`<option value="${e}">${e}</option>`).join("")}
+      </select></td>`;
+    const [ , inN, inT, sel ] = [0, ...tr.querySelectorAll("input,select")];
+    inN.value = f.nombre; inT.value = f.telefono; sel.value = f.estado;
+    inN.addEventListener("input", ()=>{ f.nombre = inN.value; actualizar(); });
+    inT.addEventListener("input", ()=>{ f.telefono = inT.value; actualizar(); });
+    sel.addEventListener("change", ()=>{ f.estado = sel.value; tr.className = f.estado; actualizar(); });
+    tbody.appendChild(tr);
+  });
+}
+
+function conteos(){
+  const c = {LIBRE:0,SEPARADO:0,PAGO:0};
+  data.filas.forEach(f=>c[f.estado]++);
+  return c;
+}
+
+function dibujar(){
+  const cv = document.getElementById("cv"), ctx = cv.getContext("2d");
+  const W = cv.width, H = cv.height, c = conteos();
+  ctx.fillStyle = "#fff"; ctx.fillRect(0,0,W,H);
+
+  ctx.fillStyle = "#1d2433"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  ctx.font = "bold 48px Georgia, serif";
+  ctx.fillText(data.titulo || "Rifa", W/2, 60);
+
+  const cell = 90, gx = (W - cell*10)/2, gy = 120;
+  ctx.font = "bold 34px Georgia, serif";
+  for(let i=0;i<100;i++){
+    const x = gx + (i%10)*cell, y = gy + Math.floor(i/10)*cell;
+    ctx.fillStyle = COLOR[data.filas[i].estado];
+    ctx.fillRect(x,y,cell,cell);
+    ctx.strokeStyle = "#1d2433"; ctx.lineWidth = 2; ctx.strokeRect(x,y,cell,cell);
+    ctx.fillStyle = data.filas[i].estado==="PAGO" ? "#fff" : "#1d2433";
+    ctx.fillText(pad(i), x+cell/2, y+cell/2);
+  }
+
+  const by = gy + cell*10 + 40, bw = 280, gap = 30, bx = (W - (bw*3+gap*2))/2;
+  const items = [["LIBRES",c.LIBRE,"#ffffff"],["SEPARADOS",c.SEPARADO,"#f5c518"],["PAGOS",c.PAGO,"#2eb85c"]];
+  items.forEach(([lab,val,col],k)=>{
+    const x = bx + k*(bw+gap);
+    ctx.fillStyle = col; ctx.fillRect(x,by,bw,110);
+    ctx.strokeStyle = "#1d2433"; ctx.lineWidth = 2; ctx.strokeRect(x,by,bw,110);
+    ctx.fillStyle = col==="#2eb85c" ? "#fff" : "#1d2433";
+    ctx.font = "bold 52px Georgia, serif"; ctx.fillText(val, x+bw/2, by+42);
+    ctx.font = "22px system-ui, sans-serif"; ctx.fillText(lab, x+bw/2, by+88);
+  });
+}
+
+function actualizar(){
+  const c = conteos();
+  document.getElementById("cL").textContent = c.LIBRE;
+  document.getElementById("cS").textContent = c.SEPARADO;
+  document.getElementById("cP").textContent = c.PAGO;
+  dibujar(); guardar();
+}
+
+tituloEl.addEventListener("input", ()=>{ data.titulo = tituloEl.value; actualizar(); });
+
+document.getElementById("dl").addEventListener("click", ()=>{
+  const a = document.createElement("a");
+  a.href = document.getElementById("cv").toDataURL("image/png");
+  a.download = "rifa.png";
+  a.click();
+});
+
+document.getElementById("reset").addEventListener("click", ()=>{
+  if(!confirm("¿Borrar todos los nombres, teléfonos y estados?")) return;
+  data = { titulo:"", filas: Array.from({length:100},()=>({nombre:"",telefono:"",estado:"LIBRE"})) };
+  tituloEl.value = ""; construir(); actualizar();
+});
+
+cargar();
+tituloEl.value = data.titulo || "";
+construir();
+actualizar();
+</script>
+</body>
+</html>

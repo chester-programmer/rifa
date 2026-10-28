@@ -22,9 +22,7 @@
   summary{cursor:pointer;font-weight:600}
   .cfg{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;margin-top:12px}
   .cfg label{font-size:.8rem;color:var(--muted);display:block}
-  .foto{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px}
-  .foto input{width:auto}
-  .scroll{overflow:auto;border:1px solid var(--line);border-radius:10px;background:var(--card);max-height:520px}
+    .scroll{overflow:auto;border:1px solid var(--line);border-radius:10px;background:var(--card);max-height:520px}
   table{width:100%;border-collapse:collapse}
   th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left}
   th{position:sticky;top:0;background:var(--card);z-index:1;font-size:.85rem}
@@ -48,13 +46,8 @@
   <p class="sub" id="estado" style="margin-top:-8px"></p>
 
   <details>
-    <summary>Personalizar la imagen (textos y foto del premio)</summary>
+    <summary>Personalizar la imagen (textos)</summary>
     <div class="cfg" id="cfg"></div>
-    <div class="foto">
-      <label for="foto">Foto del premio:</label>
-      <input type="file" id="foto" accept="image/*">
-      <button class="sec" id="quitarFoto" type="button">Quitar foto</button>
-    </div>
   </details>
 
   <div class="scroll">
@@ -106,17 +99,17 @@ const CAMPOS = [
   ["s1a","Característica 1 (título)"],["s1b","Característica 1 (detalle)"],
   ["s2a","Característica 2 (título)"],["s2b","Característica 2 (detalle)"],
   ["s3a","Característica 3 (título)"],["s3b","Característica 3 (detalle)"],
-  ["cta","Frase de cierre"],["f1","Ventaja 1"],["f2","Ventaja 2"],["f3","Ventaja 3"],
+  ["cta","Frase de cierre"],["valor","Valor de la boleta"],["f1","Ventaja 1"],["f2","Ventaja 2"],["f3","Ventaja 3"],
   ["pago","Métodos de pago"],["tel","Teléfono / WhatsApp"]
 ];
 const CFG0 = {
   t1a:"GRAN", t1b:"RIFA", premio:"DE UN PORTÁTIL", gancho:"Tu número puede ser el ganador",
   producto:"Dell Latitude 3420", desc:"Rendimiento y confiabilidad en tus manos",
   s1a:"Procesador", s1b:"Intel Core i5 1135G7", s2a:"RAM", s2b:"8 GB DDR4", s3a:"Almacenamiento", s3b:"NVMe 512 GB",
-  cta:"¡Participa y gana!", f1:"Diseño moderno y portátil", f2:"Rendimiento y velocidad",
+  cta:"¡Participa y gana!", valor:"$20.000", f1:"Diseño moderno y portátil", f2:"Rendimiento y velocidad",
   f3:"Ideal para estudiar, trabajar y mucho más...", pago:"Nequi o pago por Bre-b", tel:"3202464794"
 };
-const nuevoData = () => ({ cfg:{...CFG0}, img:"", filas: Array.from({length:100}, vacia) });
+const nuevoData = () => ({ cfg:{...CFG0}, filas: Array.from({length:100}, vacia) });
 
 let data = nuevoData();
 let db = null;
@@ -135,7 +128,6 @@ function cargarLocal(){
 }
 function guardarFila(i){ NUBE ? db.ref("rifa/filas/"+i).set(data.filas[i]) : guardarLocal(); }
 function guardarCfg(k){ NUBE ? db.ref("rifa/cfg/"+k).set(data.cfg[k]) : guardarLocal(); }
-function guardarImg(){ NUBE ? db.ref("rifa/img").set(data.img) : guardarLocal(); }
 
 /* ---------- Formulario de textos ---------- */
 const cfgBox = document.getElementById("cfg");
@@ -147,34 +139,14 @@ CAMPOS.forEach(([k,lab])=>{
   cfgBox.appendChild(d); cfgInputs[k] = inp;
 });
 
-/* ---------- Foto del premio ---------- */
-document.getElementById("foto").addEventListener("change", e=>{
-  const f = e.target.files[0]; if(!f) return;
-  const rd = new FileReader();
-  rd.onload = ()=>{
-    const im = new Image();
-    im.onload = ()=>{
-      const m = Math.min(1, 800/Math.max(im.width, im.height));
-      const c = document.createElement("canvas");
-      c.width = Math.round(im.width*m); c.height = Math.round(im.height*m);
-      c.getContext("2d").drawImage(im,0,0,c.width,c.height);
-      data.img = c.toDataURL("image/jpeg",0.82); guardarImg(); resumen();
-    };
-    im.src = rd.result;
-  };
-  rd.readAsDataURL(f);
-});
-document.getElementById("quitarFoto").addEventListener("click", ()=>{ data.img=""; guardarImg(); resumen(); });
-
-let imgObj = null, imgSrc = "";
-function actualizarImg(){
-  if(data.img === imgSrc) return;
-  imgSrc = data.img;
-  if(!imgSrc){ imgObj = null; return; }
+/* ---------- Foto fija del premio (archivo premio.png en la raíz del repositorio) ---------- */
+let imgObj = null;
+(function(){
   const im = new Image();
   im.onload = ()=>{ imgObj = im; dibujar(conteos()); };
-  im.src = imgSrc;
-}
+  im.src = "premio.png";
+})();
+function actualizarImg(){}
 
 /* ---------- Tabla ---------- */
 function construir(){
@@ -286,7 +258,7 @@ function dibujar(c){
   }else{
     ctx.setLineDash([10,8]); ctx.strokeStyle = "rgba(255,255,255,.6)"; ctx.lineWidth = 3;
     rr(ctx,25,435,380,300,20); ctx.stroke(); ctx.setLineDash([]);
-    ctx.fillStyle = "rgba(255,255,255,.75)"; ctx.font = "24px Arial"; ctx.fillText("Sube la foto del premio",215,585);
+    ctx.fillStyle = "rgba(255,255,255,.75)"; ctx.font = "24px Arial"; ctx.fillText("Falta el archivo premio.png",215,585);
   }
   ctx.textAlign = "left"; ctx.fillStyle = "#fff"; ctx.font = "900 40px Arial, sans-serif";
   let y = texto(ctx,k.producto,430,490,225,46);
@@ -303,9 +275,16 @@ function dibujar(c){
   });
 
   // Frase de cierre
-  banda(ctx,15,962,640,90,AMAR,26);
-  ctx.font = "50px serif"; ctx.fillStyle = NAV; ctx.fillText("🏆",70,1008);
-  ajustar(ctx,k.cta||"","italic 900",50,470,FUENTE); ctx.fillText(k.cta||"",375,1008);
+  banda(ctx,15,946,640,84,AMAR,26);
+  ctx.font = "50px serif"; ctx.fillStyle = NAV; ctx.fillText("🏆",70,990);
+  ajustar(ctx,k.cta||"","italic 900",50,470,FUENTE); ctx.fillText(k.cta||"",375,990);
+
+  // Valor de la boleta
+  ctx.fillStyle = "#fff"; rr(ctx,80,1040,510,46,23); ctx.fill();
+  ctx.strokeStyle = AMAR; ctx.lineWidth = 3; rr(ctx,80,1040,510,46,23); ctx.stroke();
+  ctx.fillStyle = NAV; ctx.textAlign = "center";
+  ajustar(ctx,"Valor de la boleta: "+(k.valor||""),"900",30,470,"Arial, sans-serif");
+  ctx.fillText("Valor de la boleta: "+(k.valor||""),335,1064);
 
   // Ventajas
   ctx.fillStyle = AZUL; ctx.fillRect(0,1092,652,128);
@@ -387,7 +366,6 @@ if(NUBE){
   db.ref("rifa").on("value", snap=>{
     const v = snap.val() || {};
     data.cfg = {...CFG0, ...(v.cfg||{})};
-    data.img = v.img || "";
     for(let i=0;i<100;i++){
       const r = v.filas && v.filas[i];
       data.filas[i] = { nombre:r?.nombre||"", telefono:r?.telefono||"", estado:ESTADOS.includes(r?.estado)?r.estado:"LIBRE" };

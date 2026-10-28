@@ -99,14 +99,14 @@ const CAMPOS = [
   ["s1a","Característica 1 (título)"],["s1b","Característica 1 (detalle)"],
   ["s2a","Característica 2 (título)"],["s2b","Característica 2 (detalle)"],
   ["s3a","Característica 3 (título)"],["s3b","Característica 3 (detalle)"],
-  ["cta","Frase de cierre"],["valor","Valor de la boleta"],["f1","Ventaja 1"],["f2","Ventaja 2"],["f3","Ventaja 3"],
+  ["cta","Frase de cierre"],["valor","Valor de la boleta"],["juega","Fecha del sorteo"],["f1","Ventaja 1"],["f2","Ventaja 2"],["f3","Ventaja 3"],
   ["pago","Métodos de pago"],["tel","Teléfono / WhatsApp"]
 ];
 const CFG0 = {
   t1a:"GRAN", t1b:"RIFA", premio:"DE UN PORTÁTIL", gancho:"Tu número puede ser el ganador",
   producto:"Dell Latitude 3420", desc:"Rendimiento y confiabilidad en tus manos",
   s1a:"Procesador", s1b:"Intel Core i5 1135G7", s2a:"RAM", s2b:"8 GB DDR4", s3a:"Almacenamiento", s3b:"NVMe 512 GB",
-  cta:"¡Participa y gana!", valor:"$20.000", f1:"Diseño moderno y portátil", f2:"Rendimiento y velocidad",
+  cta:"¡Participa y gana!", valor:"$20.000", juega:"Juega el 16 de diciembre con las 2 últimas cifras de la lotería del Meta", f1:"Diseño moderno y portátil", f2:"Rendimiento y velocidad",
   f3:"Ideal para estudiar, trabajar y mucho más...", pago:"Nequi o pago por Bre-b", tel:"3202464794"
 };
 const nuevoData = () => ({ cfg:{...CFG0}, filas: Array.from({length:100}, vacia) });
@@ -265,33 +265,37 @@ function dibujar(c){
   ctx.font = "600 25px Arial, sans-serif"; texto(ctx,k.desc,430,y+22,225,31);
 
   // Características
-  ctx.fillStyle = AZUL; rr(ctx,28,770,625,165,22); ctx.fill();
-  ctx.strokeStyle = "#3f86ff"; ctx.lineWidth = 2; rr(ctx,28,770,625,165,22); ctx.stroke();
+  ctx.fillStyle = AZUL; rr(ctx,28,770,625,150,22); ctx.fill();
+  ctx.strokeStyle = "#3f86ff"; ctx.lineWidth = 2; rr(ctx,28,770,625,150,22); ctx.stroke();
   ctx.textAlign = "center"; ctx.fillStyle = "#fff"; ctx.font = "bold 27px Arial, sans-serif";
   [[k.s1a,k.s1b],[k.s2a,k.s2b],[k.s3a,k.s3b]].forEach(([a,b],i)=>{
     const cx = 28 + 104 + i*208, ls = lineas(ctx,`${a||""} ${b||""}`,185);
-    ls.slice(0,4).forEach((l,j)=>ctx.fillText(l,cx, 852 - (Math.min(ls.length,4)-1)*16 + j*32));
-    if(i>0){ ctx.strokeStyle="#4aa3ff"; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(28+i*208,792); ctx.lineTo(28+i*208,913); ctx.stroke(); }
+    ls.slice(0,4).forEach((l,j)=>ctx.fillText(l,cx, 845 - (Math.min(ls.length,4)-1)*16 + j*32));
+    if(i>0){ ctx.strokeStyle="#4aa3ff"; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(28+i*208,788); ctx.lineTo(28+i*208,902); ctx.stroke(); }
   });
 
   // Frase de cierre
-  banda(ctx,15,946,640,84,AMAR,26);
-  ctx.font = "50px serif"; ctx.fillStyle = NAV; ctx.fillText("🏆",70,990);
-  ajustar(ctx,k.cta||"","italic 900",50,470,FUENTE); ctx.fillText(k.cta||"",375,990);
+  banda(ctx,15,930,640,76,AMAR,26);
+  ctx.font = "46px serif"; ctx.fillStyle = NAV; ctx.fillText("🏆",70,969);
+  ajustar(ctx,k.cta||"","italic 900",48,470,FUENTE); ctx.fillText(k.cta||"",375,969);
 
   // Valor de la boleta
-  ctx.fillStyle = "#fff"; rr(ctx,80,1040,510,46,23); ctx.fill();
-  ctx.strokeStyle = AMAR; ctx.lineWidth = 3; rr(ctx,80,1040,510,46,23); ctx.stroke();
+  ctx.fillStyle = "#fff"; rr(ctx,80,1014,510,42,21); ctx.fill();
+  ctx.strokeStyle = AMAR; ctx.lineWidth = 3; rr(ctx,80,1014,510,42,21); ctx.stroke();
   ctx.fillStyle = NAV; ctx.textAlign = "center";
-  ajustar(ctx,"Valor de la boleta: "+(k.valor||""),"900",30,470,"Arial, sans-serif");
-  ctx.fillText("Valor de la boleta: "+(k.valor||""),335,1064);
+  ajustar(ctx,"Valor de la boleta: "+(k.valor||""),"900",28,470,"Arial, sans-serif");
+  ctx.fillText("Valor de la boleta: "+(k.valor||""),335,1036);
+
+  // Fecha del sorteo
+  ctx.fillStyle = "#fff"; ctx.font = "bold 21px Arial, sans-serif";
+  lineas(ctx,k.juega,600).slice(0,2).forEach((l,j)=>ctx.fillText(l,335,1073+j*24));
 
   // Ventajas
-  ctx.fillStyle = AZUL; ctx.fillRect(0,1092,652,128);
+  ctx.fillStyle = AZUL; ctx.fillRect(0,1118,652,102);
   [[k.f1,"💻"],[k.f2,"🛡️"],[k.f3,"👍"]].forEach(([t,ic],i)=>{
     const cx = 18 + 105 + i*217;
-    ctx.font = "34px serif"; ctx.fillStyle = "#fff"; ctx.fillText(ic,cx,1128);
-    ctx.font = "bold 20px Arial, sans-serif"; lineas(ctx,t,195).slice(0,3).forEach((l,j)=>ctx.fillText(l,cx,1166+j*25));
+    ctx.font = "28px serif"; ctx.fillStyle = "#fff"; ctx.fillText(ic,cx,1138);
+    ctx.font = "bold 18px Arial, sans-serif"; lineas(ctx,t,195).slice(0,3).forEach((l,j)=>ctx.fillText(l,cx,1166+j*22));
   });
 
   // Encabezado derecho
